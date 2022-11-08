@@ -31,11 +31,15 @@ export function Home() {
   const screenShotRef = useRef(null);
 
   async function handleTakePicture() {
-    const photo = await cameraRef.current.takePictureAsync();
+    const photo = await cameraRef.current.takePictureAsync({
+      quality: 1,
+    });
     setPhotoURI(photo.uri);
   }
 
   async function shareScreenShot() {
+    if (!photo) return;
+
     const screenshot = await captureRef(screenShotRef);
     await Sharing.shareAsync('file://' + screenshot);
   }
@@ -71,7 +75,6 @@ export function Home() {
                 }}
                 style={styles.camera}
                 // Garanti que a imagem foi carregada
-                onLoad={shareScreenShot}
               />
             )}
 
@@ -95,7 +98,10 @@ export function Home() {
           </TouchableOpacity>
         )}
 
-        <Button title="Compartilhar" onPress={handleTakePicture} />
+        <Button
+          title={photo ? 'Compartilhar' : 'Salvar'}
+          onPress={photo ? shareScreenShot : handleTakePicture}
+        />
       </ScrollView>
     </SafeAreaView>
   );
